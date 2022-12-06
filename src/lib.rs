@@ -3,6 +3,7 @@ use std::fs::File;
 pub mod d1;
 pub mod d2;
 pub mod d3;
+pub mod d4;
 
 pub trait Solver {
     type Solution;

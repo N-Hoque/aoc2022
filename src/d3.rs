@@ -93,12 +93,6 @@ fn solve_part_two() -> u64 {
 }
 
 #[test]
-fn test() {
-    let compartments = parse_rucksacks(true);
-    println!("{:?}", compartments);
-}
-
-#[test]
 fn solve_sample_one() {
     let compartments = parse_rucksacks(true);
 
