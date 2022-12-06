@@ -1,6 +1,7 @@
-use std::{fs::File, io::BufRead, path::Path};
+use std::fs::File;
 
 pub mod d1;
+pub mod d2;
 
 pub trait Solver {
     type Solution;
@@ -37,41 +38,4 @@ pub(crate) fn get_day_input(day: Day, load_sample: bool) -> File {
     };
 
     File::open(&path).unwrap_or_else(|_| panic!("Opening {}", path))
-}
-
-pub(crate) fn read_values<P: AsRef<Path>>(day: Day, load_sample: bool) -> Vec<u64> {
-    let file = get_day_input(day, load_sample);
-
-    let buffer = std::io::BufReader::new(file);
-
-    let mut values = Vec::new();
-
-    for line in buffer.lines().flatten() {
-        let value = line.parse().expect("Parsing value");
-        values.push(value);
-    }
-
-    values
-}
-
-pub(crate) fn read_chunked_values<P: AsRef<Path>>(day: Day, load_sample: bool) -> Vec<Vec<u64>> {
-    let file = get_day_input(day, load_sample);
-
-    let buffer = std::io::BufReader::new(file);
-
-    let mut values = Vec::new();
-
-    let mut chunk = Vec::new();
-
-    for line in buffer.lines().flatten() {
-        if line.is_empty() {
-            values.push(chunk.clone());
-            chunk.clear();
-        } else {
-            let value = line.parse().expect("Parsing value");
-            chunk.push(value);
-        }
-    }
-
-    values
 }
