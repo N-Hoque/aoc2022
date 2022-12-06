@@ -1,0 +1,4 @@
+/target
+res/day_*.txt
+
+!res/day_*_sample.txt
