@@ -2,11 +2,11 @@ use std::{collections::HashMap, io::BufRead};
 
 use petgraph::{prelude::DiGraph, stable_graph::NodeIndex, visit::Dfs, Graph};
 
-use crate::{get_day_input, Day, Part, Solver};
+use crate::{get_day_input, AOCSolver, Day, Part};
 
-pub struct D7Solver;
+pub struct Solver;
 
-impl Solver for D7Solver {
+impl AOCSolver for Solver {
     type Solution = u64;
 
     fn solve(part: Part) -> Self::Solution {
@@ -160,12 +160,12 @@ fn update_filesystem(filesystem: DiGraph<String, u64>) -> DiGraph<String, u64> {
 }
 
 fn find_directory_sizes(
-    filesystem: Graph<String, u64>,
+    filesystem: &Graph<String, u64>,
     root: NodeIndex,
 ) -> HashMap<NodeIndex, u64> {
-    let mut dfs = Dfs::new(&filesystem, root);
+    let mut dfs = Dfs::new(filesystem, root);
     let mut dirs = HashMap::new();
-    while let Some(node) = dfs.next(&filesystem) {
+    while let Some(node) = dfs.next(filesystem) {
         let neighbor_edges = filesystem.edges(node).collect::<Vec<_>>();
         if neighbor_edges.is_empty() {
             continue;
@@ -178,8 +178,8 @@ fn find_directory_sizes(
 }
 
 fn find_min_dir_size(dirs: HashMap<NodeIndex, u64>, root: NodeIndex) -> u64 {
-    const MAX_SPACE: u64 = 70000000;
-    const MIN_SPACE: u64 = 30000000;
+    const MAX_SPACE: u64 = 70_000_000;
+    const MIN_SPACE: u64 = 30_000_000;
 
     let filesystem_amount_left = MAX_SPACE - dirs[&root];
     let mut dirs_as_vec = dirs.into_iter().collect::<Vec<(_, _)>>();
@@ -202,9 +202,9 @@ fn solve_part_one() -> u64 {
 
     let root = filesystem.node_indices().next().unwrap();
 
-    let dirs = find_directory_sizes(filesystem, root);
+    let dirs = find_directory_sizes(&filesystem, root);
 
-    dirs.values().filter(|w| **w <= 100000).sum::<u64>()
+    dirs.values().filter(|w| **w <= 100_000).sum::<u64>()
 }
 
 fn solve_part_two() -> u64 {
@@ -213,33 +213,14 @@ fn solve_part_two() -> u64 {
 
     let root = filesystem.node_indices().next().unwrap();
 
-    let dirs = find_directory_sizes(filesystem, root);
+    let dirs = find_directory_sizes(&filesystem, root);
 
     find_min_dir_size(dirs, root)
 }
 
 #[cfg(test)]
 mod tests {
-    use std::io::Write;
-
-    use petgraph::dot::Dot;
-
     use super::{find_directory_sizes, find_min_dir_size, parse_filesystem, update_filesystem};
-
-    #[test]
-    fn read_filesystem() {
-        let filesystem = parse_filesystem(true);
-
-        let mut test_file = std::fs::File::create("res/day_7_sample.dot").unwrap();
-
-        write!(&mut test_file, "{}", Dot::new(&filesystem)).unwrap();
-
-        let filesystem = update_filesystem(filesystem);
-
-        let mut test_file = std::fs::File::create("res/day_7_sample_updated.dot").unwrap();
-
-        write!(&mut test_file, "{}", Dot::new(&filesystem)).unwrap();
-    }
 
     #[test]
     fn solve_sample_one() {
@@ -248,9 +229,9 @@ mod tests {
 
         let root = filesystem.node_indices().next().unwrap();
 
-        let dirs = find_directory_sizes(filesystem, root);
+        let dirs = find_directory_sizes(&filesystem, root);
 
-        let total_size = dirs.values().filter(|w| **w <= 100000).sum::<u64>();
+        let total_size = dirs.values().filter(|w| **w <= 100_000).sum::<u64>();
 
         assert_eq!(total_size, 95437);
     }
@@ -262,10 +243,10 @@ mod tests {
 
         let root = filesystem.node_indices().next().unwrap();
 
-        let dirs = find_directory_sizes(filesystem, root);
+        let dirs = find_directory_sizes(&filesystem, root);
 
         let min_size = find_min_dir_size(dirs, root);
 
-        assert_eq!(min_size, 24933642);
+        assert_eq!(min_size, 24_933_642);
     }
 }

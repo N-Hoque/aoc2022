@@ -1,10 +1,10 @@
 use std::{io::BufRead, ops::RangeInclusive};
 
-use crate::{get_day_input, Day, Part, Solver};
+use crate::{get_day_input, AOCSolver, Day, Part};
 
-pub struct D4Solver;
+pub struct Solver;
 
-impl Solver for D4Solver {
+impl AOCSolver for Solver {
     type Solution = u64;
 
     fn solve(part: Part) -> Self::Solution {
@@ -85,40 +85,45 @@ fn solve_part_two() -> u64 {
     shared_assignments
 }
 
-#[test]
-fn solve_sample_one() {
-    let assignments = parse_assignments(true);
+#[cfg(test)]
+mod tests {
+    use crate::d04::parse_assignments;
 
-    let mut shared_assignments = 0;
+    #[test]
+    fn solve_sample_one() {
+        let assignments = parse_assignments(true);
 
-    for assignment in assignments {
-        if assignment.e1.contains(assignment.e2.start())
-            && assignment.e1.contains(assignment.e2.end())
-            || assignment.e2.contains(assignment.e1.start())
-                && assignment.e2.contains(assignment.e1.end())
-        {
-            shared_assignments += 1;
+        let mut shared_assignments = 0;
+
+        for assignment in assignments {
+            if assignment.e1.contains(assignment.e2.start())
+                && assignment.e1.contains(assignment.e2.end())
+                || assignment.e2.contains(assignment.e1.start())
+                    && assignment.e2.contains(assignment.e1.end())
+            {
+                shared_assignments += 1;
+            }
         }
+
+        assert_eq!(2, shared_assignments);
     }
 
-    assert_eq!(2, shared_assignments);
-}
+    #[test]
+    fn solve_sample_two() {
+        let assignments = parse_assignments(true);
 
-#[test]
-fn solve_sample_two() {
-    let assignments = parse_assignments(true);
+        let mut shared_assignments = 0;
 
-    let mut shared_assignments = 0;
-
-    for assignment in assignments {
-        if assignment.e1.contains(assignment.e2.start())
-            || assignment.e1.contains(assignment.e2.end())
-            || assignment.e2.contains(assignment.e1.start())
-            || assignment.e2.contains(assignment.e1.end())
-        {
-            shared_assignments += 1;
+        for assignment in assignments {
+            if assignment.e1.contains(assignment.e2.start())
+                || assignment.e1.contains(assignment.e2.end())
+                || assignment.e2.contains(assignment.e1.start())
+                || assignment.e2.contains(assignment.e1.end())
+            {
+                shared_assignments += 1;
+            }
         }
-    }
 
-    assert_eq!(4, shared_assignments);
+        assert_eq!(4, shared_assignments);
+    }
 }

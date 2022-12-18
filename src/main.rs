@@ -1,8 +1,9 @@
-use aoc2022::{d9::D9Solver as DaySolver, Part, Solver};
+use aoc2022::collect_all_solutions;
 
 fn main() {
-    let d1_p1 = DaySolver::solve(Part::One);
-    println!("Part One: {d1_p1}");
-    let d1_p2 = DaySolver::solve(Part::Two);
-    println!("Part Two: {d1_p2}");
+    let all_solutions = collect_all_solutions();
+
+    for solution in all_solutions {
+        println!("{solution}");
+    }
 }

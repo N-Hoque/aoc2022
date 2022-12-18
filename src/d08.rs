@@ -1,10 +1,13 @@
-use std::io::BufRead;
+use std::{
+    io::BufRead,
+    iter::{IntoIterator, Iterator},
+};
 
-use crate::{get_day_input, Day, Part, Solver};
+use crate::{get_day_input, AOCSolver, Day, Part};
 
-pub struct D8Solver;
+pub struct Solver;
 
-impl Solver for D8Solver {
+impl AOCSolver for Solver {
     type Solution = u64;
 
     fn solve(part: Part) -> Self::Solution {
@@ -19,23 +22,6 @@ impl Solver for D8Solver {
 struct Forest {
     trees: Vec<Vec<u64>>,
     flipped_trees: Vec<Vec<u64>>,
-}
-
-impl std::fmt::Display for Forest {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use std::fmt::Write;
-
-        let mut result = String::new();
-
-        for row in &self.trees {
-            for value in row {
-                write!(&mut result, "{}", value).unwrap();
-            }
-            writeln!(&mut result).unwrap();
-        }
-
-        write!(f, "{}", result)
-    }
 }
 
 impl Forest {
@@ -113,11 +99,11 @@ impl Forest {
         current_score
     }
 
-    fn rows(&self) -> &Vec<Vec<u64>> {
+    const fn rows(&self) -> &Vec<Vec<u64>> {
         &self.trees
     }
 
-    fn cols(&self) -> &Vec<Vec<u64>> {
+    const fn cols(&self) -> &Vec<Vec<u64>> {
         &self.flipped_trees
     }
 
@@ -134,12 +120,12 @@ impl Forest {
 
         assert!(!v.is_empty());
         let len = v[0].len();
-        let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter()).collect();
+        let mut iters: Vec<_> = v.into_iter().map(IntoIterator::into_iter).collect();
         (0..len)
             .map(|_| {
                 iters
                     .iter_mut()
-                    .filter_map(|n| n.next())
+                    .filter_map(Iterator::next)
                     .collect::<Vec<_>>()
             })
             .collect()
@@ -157,7 +143,7 @@ fn parse_forest(load_sample: bool) -> Forest {
         let mut row = Vec::new();
 
         for char in line.chars() {
-            let value = char.to_digit(10).unwrap() as u64;
+            let value = u64::from(char.to_digit(10).unwrap());
             row.push(value);
         }
 
@@ -206,45 +192,48 @@ fn solve_part_two() -> u64 {
     max_scenic_score
 }
 
-#[test]
-fn solve_sample_one() {
-    let trees = parse_forest(true);
+#[cfg(test)]
+mod tests {
+    use crate::d08::parse_forest;
 
-    println!("{}", trees);
+    #[test]
+    fn solve_sample_one() {
+        let forest = parse_forest(true);
 
-    let num_rows = trees.num_rows();
-    let num_cols = trees.num_cols();
+        let num_rows = forest.num_rows();
+        let num_cols = forest.num_cols();
 
-    let mut num_trees_visible = 0;
+        let mut num_trees_visible = 0;
 
-    for row in 0..num_rows {
-        for col in 0..num_cols {
-            if trees.is_visible(row, col) {
-                num_trees_visible += 1;
+        for row in 0..num_rows {
+            for col in 0..num_cols {
+                if forest.is_visible(row, col) {
+                    num_trees_visible += 1;
+                }
             }
         }
+
+        assert_eq!(num_trees_visible, 21);
     }
 
-    assert_eq!(num_trees_visible, 21);
-}
+    #[test]
+    fn solve_sample_two() {
+        let forest = parse_forest(true);
 
-#[test]
-fn solve_sample_two() {
-    let trees = parse_forest(true);
+        let num_rows = forest.num_rows();
+        let num_cols = forest.num_cols();
 
-    let num_rows = trees.num_rows();
-    let num_cols = trees.num_cols();
+        let mut max_scenic_score = 0;
 
-    let mut max_scenic_score = 0;
-
-    for row in 0..num_rows {
-        for col in 0..num_cols {
-            let scenic_score = trees.scenic_score(row, col);
-            if scenic_score >= max_scenic_score {
-                max_scenic_score = scenic_score;
+        for row in 0..num_rows {
+            for col in 0..num_cols {
+                let scenic_score = forest.scenic_score(row, col);
+                if scenic_score >= max_scenic_score {
+                    max_scenic_score = scenic_score;
+                }
             }
         }
-    }
 
-    assert_eq!(max_scenic_score, 8);
+        assert_eq!(max_scenic_score, 8);
+    }
 }

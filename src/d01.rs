@@ -1,10 +1,10 @@
 use std::io::BufRead;
 
-use crate::{get_day_input, Day, Part, Solver};
+use crate::{get_day_input, AOCSolver, Day, Part};
 
-pub struct D1Solver;
+pub struct Solver;
 
-impl Solver for D1Solver {
+impl AOCSolver for Solver {
     type Solution = u64;
 
     fn solve(part: Part) -> Self::Solution {
@@ -16,7 +16,7 @@ impl Solver for D1Solver {
     }
 }
 
-fn summarise_elves(load_sample: bool) -> Vec<u64> {
+fn parse_elves(load_sample: bool) -> Vec<u64> {
     let file = get_day_input(Day::new(1), load_sample);
     let reader = std::io::BufReader::new(file);
 
@@ -39,33 +39,38 @@ fn summarise_elves(load_sample: bool) -> Vec<u64> {
 }
 
 fn solve_part_one() -> u64 {
-    let summed_values = summarise_elves(false);
+    let summed_values = parse_elves(false);
 
     *summed_values.iter().max().unwrap()
 }
 
 fn solve_part_two() -> u64 {
-    let mut summed_values = summarise_elves(false);
+    let mut summed_values = parse_elves(false);
 
     summed_values.sort_unstable_by(|x, y| y.cmp(x));
 
     summed_values[0] + summed_values[1] + summed_values[2]
 }
 
-#[test]
-fn solve_sample_one() {
-    let summed_values = summarise_elves(true);
+#[cfg(test)]
+mod tests {
+    use crate::d01::parse_elves;
 
-    assert_eq!(Some(24000), summed_values.iter().max().copied());
-}
+    #[test]
+    fn solve_sample_one() {
+        let summed_values = parse_elves(true);
 
-#[test]
-fn solve_sample_two() {
-    let mut summed_values = summarise_elves(true);
+        assert_eq!(Some(24000), summed_values.iter().max().copied());
+    }
 
-    summed_values.sort_unstable_by(|x, y| y.cmp(x));
+    #[test]
+    fn solve_sample_two() {
+        let mut summed_values = parse_elves(true);
 
-    let max_three_sum = summed_values[0] + summed_values[1] + summed_values[2];
+        summed_values.sort_unstable_by(|x, y| y.cmp(x));
 
-    assert_eq!(45000, max_three_sum);
+        let max_three_sum = summed_values[0] + summed_values[1] + summed_values[2];
+
+        assert_eq!(45000, max_three_sum);
+    }
 }

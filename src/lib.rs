@@ -1,22 +1,79 @@
 use std::fs::File;
 
-pub mod d1;
-pub mod d2;
-pub mod d3;
-pub mod d4;
-pub mod d5;
-pub mod d6;
-pub mod d7;
-pub mod d8;
-pub mod d9;
+pub(crate) mod d01;
+pub(crate) mod d02;
+pub(crate) mod d03;
+pub(crate) mod d04;
+pub(crate) mod d05;
+pub(crate) mod d06;
+pub(crate) mod d07;
+pub(crate) mod d08;
+pub(crate) mod d09;
 
-pub trait Solver {
+#[must_use]
+pub fn collect_all_solutions() -> Vec<String> {
+    let mut solutions = Vec::new();
+
+    let s1 = d01::Solver::solve(Part::One);
+    let s2 = d01::Solver::solve(Part::Two);
+
+    solutions.push(format!("1: {s1}, {s2}"));
+
+    let s1 = d02::Solver::solve(Part::One);
+    let s2 = d02::Solver::solve(Part::Two);
+
+    solutions.push(format!("2: {s1}, {s2}"));
+
+    let s1 = d03::Solver::solve(Part::One);
+    let s2 = d03::Solver::solve(Part::Two);
+
+    solutions.push(format!("3: {s1}, {s2}"));
+
+    let s1 = d04::Solver::solve(Part::One);
+    let s2 = d04::Solver::solve(Part::Two);
+
+    solutions.push(format!("4: {s1}, {s2}"));
+
+    let s1 = d05::Solver::solve(Part::One);
+    let s2 = d05::Solver::solve(Part::Two);
+
+    solutions.push(format!("5: {s1}, {s2}"));
+
+    let s1 = d06::Solver::solve(Part::One);
+    let s2 = d06::Solver::solve(Part::Two);
+
+    solutions.push(format!("6: {s1}, {s2}"));
+
+    let s1 = d07::Solver::solve(Part::One);
+    let s2 = d07::Solver::solve(Part::Two);
+
+    solutions.push(format!("7: {s1}, {s2}"));
+
+    let s1 = d08::Solver::solve(Part::One);
+    let s2 = d08::Solver::solve(Part::Two);
+
+    solutions.push(format!("8: {s1}, {s2}"));
+
+    let s1 = d09::Solver::solve(Part::One);
+    let s2 = d09::Solver::solve(Part::Two);
+
+    solutions.push(format!("9: {s1}, {s2}"));
+
+    let s1 = d10::Solver::solve(Part::One);
+    let s2 = d10::Solver::solve(Part::Two);
+
+    solutions.push(format!("10: {s1}, \n{s2}"));
+
+    solutions
+}
+
+pub(crate) trait AOCSolver {
     type Solution;
 
     fn solve(part: Part) -> Self::Solution;
 }
 
-pub enum Part {
+pub(crate) enum Part {
     One,
     Two,
 }
@@ -44,5 +101,5 @@ pub(crate) fn get_day_input(day: Day, load_sample: bool) -> File {
         format!("res/day_{}.txt", day.0)
     };
 
-    File::open(&path).unwrap_or_else(|_| panic!("Opening {}", path))
+    File::open(&path).unwrap_or_else(|_| panic!("Opening {path}"))
 }

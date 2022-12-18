@@ -1,10 +1,10 @@
 use std::{collections::HashSet, io::BufRead};
 
-use crate::{get_day_input, Day, Part, Solver};
+use crate::{get_day_input, AOCSolver, Day, Part};
 
-pub struct D3Solver;
+pub struct Solver;
 
-impl Solver for D3Solver {
+impl AOCSolver for Solver {
     type Solution = u64;
 
     fn solve(part: Part) -> Self::Solution {
@@ -53,7 +53,7 @@ fn solve_part_one() -> u64 {
 
     compartments.into_iter().fold(0, |acc, (c1, c2)| {
         let cs = c1.intersection(&c2).collect::<Vec<_>>();
-        acc + *cs[0] as u64
+        acc + u64::from(*cs[0])
     })
 }
 
@@ -86,56 +86,63 @@ fn solve_part_two() -> u64 {
             }
         }
 
-        summed_groups += badges.into_iter().map(|x| x as u64).sum::<u64>();
+        summed_groups += badges.into_iter().map(u64::from).sum::<u64>();
     }
 
     summed_groups
 }
 
-#[test]
-fn solve_sample_one() {
-    let compartments = parse_rucksacks(true);
+#[cfg(test)]
+mod tests {
+    use std::collections::HashSet;
 
-    let summed_priorities = compartments.into_iter().fold(0, |acc, (c1, c2)| {
-        let cs = c1.intersection(&c2).collect::<Vec<_>>();
-        acc + *cs[0] as u64
-    });
+    use crate::d03::parse_rucksacks;
 
-    assert_eq!(157, summed_priorities);
-}
+    #[test]
+    fn solve_sample_one() {
+        let compartments = parse_rucksacks(true);
 
-#[test]
-fn solve_sample_two() {
-    let compartments = parse_rucksacks(true);
+        let summed_priorities = compartments.into_iter().fold(0, |acc, (c1, c2)| {
+            let cs = c1.intersection(&c2).collect::<Vec<_>>();
+            acc + u64::from(*cs[0])
+        });
 
-    let mut grouped_compartments = Vec::new();
-
-    let mut group = Vec::new();
-
-    for (idx, (c1, c2)) in compartments.into_iter().enumerate() {
-        group.push((c1, c2));
-        if idx % 3 == 2 {
-            grouped_compartments.push(group.clone());
-            group.clear();
-        }
+        assert_eq!(157, summed_priorities);
     }
 
-    let mut summed_groups = 0;
+    #[test]
+    fn solve_sample_two() {
+        let compartments = parse_rucksacks(true);
 
-    for group in grouped_compartments {
-        let mut badges: HashSet<u8> = HashSet::new();
+        let mut grouped_compartments = Vec::new();
 
-        for (c1, c2) in group {
-            let cs = c1.union(&c2).copied().collect::<HashSet<_>>();
-            if badges.is_empty() {
-                badges = cs;
-            } else {
-                badges = badges.intersection(&cs).copied().collect::<HashSet<_>>();
+        let mut group = Vec::new();
+
+        for (idx, (c1, c2)) in compartments.into_iter().enumerate() {
+            group.push((c1, c2));
+            if idx % 3 == 2 {
+                grouped_compartments.push(group.clone());
+                group.clear();
             }
         }
 
-        summed_groups += badges.into_iter().map(|x| x as u64).sum::<u64>();
-    }
+        let mut summed_groups = 0;
 
-    assert_eq!(70, summed_groups);
+        for group in grouped_compartments {
+            let mut badges = HashSet::new();
+
+            for (c1, c2) in group {
+                let cs = c1.union(&c2).copied().collect::<HashSet<_>>();
+                if badges.is_empty() {
+                    badges = cs;
+                } else {
+                    badges = badges.intersection(&cs).copied().collect::<HashSet<_>>();
+                }
+            }
+
+            summed_groups += badges.into_iter().map(u64::from).sum::<u64>();
+        }
+
+        assert_eq!(70, summed_groups);
+    }
 }

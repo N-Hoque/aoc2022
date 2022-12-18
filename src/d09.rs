@@ -1,10 +1,10 @@
 use std::{collections::HashSet, io::BufRead};
 
-use crate::{get_day_input, Day, Part, Solver};
+use crate::{get_day_input, AOCSolver, Day, Part};
 
-pub struct D9Solver;
+pub struct Solver;
 
-impl Solver for D9Solver {
+impl AOCSolver for Solver {
     type Solution = usize;
 
     fn solve(part: Part) -> Self::Solution {
@@ -46,10 +46,10 @@ impl Position {
 }
 
 impl std::ops::Add for Position {
-    type Output = Position;
+    type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Position {
+        Self {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
         }
@@ -57,10 +57,10 @@ impl std::ops::Add for Position {
 }
 
 impl std::ops::Sub for Position {
-    type Output = Position;
+    type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        Position {
+        Self {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
         }
@@ -68,7 +68,7 @@ impl std::ops::Sub for Position {
 }
 
 impl Position {
-    pub fn move_in_direction(self, direction: Direction) -> Self {
+    pub const fn move_in_direction(self, direction: Direction) -> Self {
         match direction {
             Direction::Up => Self {
                 x: self.x,
@@ -134,6 +134,7 @@ pub struct State {
 }
 
 impl State {
+    #[must_use]
     pub fn new(knots: usize) -> Self {
         assert!(knots >= 2, "There must be at least two knots in the rope");
 
@@ -153,6 +154,7 @@ impl State {
         }
     }
 
+    #[must_use]
     pub fn num_visited_positions(&self) -> usize {
         self.visited_positions.len()
     }
@@ -169,11 +171,11 @@ fn parse_movements(load_sample: bool) -> Vec<Move> {
         let parts = line.split_ascii_whitespace().collect::<Vec<_>>();
 
         let motion = Move {
-            direction: match parts[0] {
-                "U" => Direction::Up,
-                "D" => Direction::Down,
-                "L" => Direction::Left,
-                "R" => Direction::Right,
+            direction: match parts.first() {
+                Some(&"U") => Direction::Up,
+                Some(&"D") => Direction::Down,
+                Some(&"L") => Direction::Left,
+                Some(&"R") => Direction::Right,
                 _ => unreachable!(),
             },
             steps: parts[1].parse().unwrap(),
@@ -208,74 +210,81 @@ fn solve_part_two() -> usize {
     state.num_visited_positions()
 }
 
-#[test]
-fn solve_sample_one() {
-    let instructions = parse_movements(true);
+#[cfg(test)]
+mod tests {
+    use crate::d09::{Direction, Move};
 
-    let mut state = State::new(2);
+    use super::{parse_movements, State};
 
-    for r#move in &instructions {
-        state.update(*r#move);
+    #[test]
+    fn solve_sample_one() {
+        let instructions = parse_movements(true);
+
+        let mut state = State::new(2);
+
+        for r#move in &instructions {
+            state.update(*r#move);
+        }
+
+        assert_eq!(state.num_visited_positions(), 13);
     }
 
-    assert_eq!(state.num_visited_positions(), 13);
-}
+    #[test]
+    fn solve_sample_two() {
+        let instructions = parse_movements(true);
 
-#[test]
-fn solve_sample_two() {
-    let instructions = parse_movements(true);
+        let mut state = State::new(10);
 
-    let mut state = State::new(10);
+        for r#move in &instructions {
+            state.update(*r#move);
+        }
 
-    for r#move in &instructions {
-        state.update(*r#move);
+        assert_eq!(state.num_visited_positions(), 1);
     }
 
-    assert_eq!(state.num_visited_positions(), 1);
-}
+    #[test]
+    fn solve_sample_three() {
+        let instructions = vec![
+            Move {
+                direction: Direction::Right,
+                steps: 5,
+            },
+            Move {
+                direction: Direction::Up,
+                steps: 8,
+            },
+            Move {
+                direction: Direction::Left,
+                steps: 8,
+            },
+            Move {
+                direction: Direction::Down,
+                steps: 3,
+            },
+            Move {
+                direction: Direction::Right,
+                steps: 17,
+            },
+            Move {
+                direction: Direction::Down,
+                steps: 10,
+            },
+            Move {
+                direction: Direction::Left,
+                steps: 25,
+            },
+            Move {
+                direction: Direction::Up,
+                steps: 20,
+            },
+        ];
 
-#[test]
-fn solve_sample_three() {
-    let instructions = vec![
-        Move {
-            direction: Direction::Right,
-            steps: 5,
-        },
-        Move {
-            direction: Direction::Up,
-            steps: 8,
-        },
-        Move {
-            direction: Direction::Left,
-            steps: 8,
-        },
-        Move {
-            direction: Direction::Down,
-            steps: 3,
-        },
-        Move {
-            direction: Direction::Right,
-            steps: 17,
-        },
-        Move {
-            direction: Direction::Down,
-            steps: 10,
-        },
-        Move {
-            direction: Direction::Left,
-            steps: 25,
-        },
-        Move {
-            direction: Direction::Up,
-            steps: 20,
-        },
-    ];
+        let mut state = State::new(10);
 
-    let mut state = State::new(10);
+        for r#move in &instructions {
+            state.update(*r#move);
+        }
 
-    for r#move in &instructions {
-        state.update(*r#move);
+        assert_eq!(state.num_visited_positions(), 36);
     }
-
-    assert_eq!(state.num_visited_positions(), 36);
 }

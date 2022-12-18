@@ -1,10 +1,14 @@
-use std::{collections::VecDeque, io::BufRead};
+use std::{
+    collections::VecDeque,
+    io::BufRead,
+    iter::{IntoIterator, Iterator},
+};
 
-use crate::{get_day_input, Day, Part, Solver};
+use crate::{get_day_input, AOCSolver, Day, Part};
 
-pub struct D5Solver;
+pub struct Solver;
 
-impl Solver for D5Solver {
+impl AOCSolver for Solver {
     type Solution = String;
 
     fn solve(part: Part) -> Self::Solution {
@@ -19,12 +23,12 @@ impl Solver for D5Solver {
 fn transpose(v: Vec<Vec<char>>) -> Vec<Vec<char>> {
     assert!(!v.is_empty());
     let len = v[0].len();
-    let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter()).collect();
+    let mut iters: Vec<_> = v.into_iter().map(IntoIterator::into_iter).collect();
     (0..len)
         .map(|_| {
             iters
                 .iter_mut()
-                .filter_map(|n| n.next())
+                .filter_map(Iterator::next)
                 .filter(|c| !c.is_whitespace())
                 .collect::<Vec<char>>()
         })
@@ -36,16 +40,6 @@ struct Instruction {
     source_stack: usize,
     target_stack: usize,
     move_amount: usize,
-}
-
-impl std::fmt::Display for Instruction {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "Move {} From {} To {}",
-            self.move_amount, self.source_stack, self.target_stack
-        )
-    }
 }
 
 #[derive(Debug)]
@@ -163,54 +157,61 @@ fn solve_part_two() -> String {
     top_row
 }
 
-#[test]
-fn solve_sample_one() {
-    let mut schedule = parse_manifest(true);
+#[cfg(test)]
+mod tests {
+    use std::collections::VecDeque;
 
-    for Instruction {
-        source_stack: source,
-        target_stack: target,
-        move_amount: amount,
-    } in schedule.instructions
-    {
-        for _ in 0..amount {
-            let last = schedule.arrangement[source].pop().expect("Get crate");
-            schedule.arrangement[target].push(last);
-        }
-    }
+    use crate::d05::{parse_manifest, Instruction};
 
-    let mut top_row = String::new();
-    for stack in schedule.arrangement {
-        top_row.push(*stack.last().unwrap());
-    }
+    #[test]
+    fn solve_sample_one() {
+        let mut schedule = parse_manifest(true);
 
-    assert_eq!("CMZ", top_row);
-}
-
-#[test]
-fn solve_sample_two() {
-    let mut schedule = parse_manifest(true);
-
-    for Instruction {
-        source_stack: source,
-        target_stack: target,
-        move_amount: amount,
-    } in schedule.instructions
-    {
-        let mut queue = VecDeque::new();
-
-        for _ in 0..amount {
-            let last = schedule.arrangement[source].pop().expect("Get crate");
-            queue.push_front(last);
+        for Instruction {
+            source_stack: source,
+            target_stack: target,
+            move_amount: amount,
+        } in schedule.instructions
+        {
+            for _ in 0..amount {
+                let last = schedule.arrangement[source].pop().expect("Get crate");
+                schedule.arrangement[target].push(last);
+            }
         }
 
-        schedule.arrangement[target].extend(&queue);
+        let mut top_row = String::new();
+        for stack in schedule.arrangement {
+            top_row.push(*stack.last().unwrap());
+        }
+
+        assert_eq!("CMZ", top_row);
     }
 
-    let mut top_row = String::new();
-    for stack in schedule.arrangement {
-        top_row.push(*stack.last().unwrap());
-    }
+    #[test]
+    fn solve_sample_two() {
+        let mut schedule = parse_manifest(true);
 
-    assert_eq!("MCD", top_row);
+        for Instruction {
+            source_stack: source,
+            target_stack: target,
+            move_amount: amount,
+        } in schedule.instructions
+        {
+            let mut queue = VecDeque::new();
+
+            for _ in 0..amount {
+                let last = schedule.arrangement[source].pop().expect("Get crate");
+                queue.push_front(last);
+            }
+
+            schedule.arrangement[target].extend(&queue);
+        }
+
+        let mut top_row = String::new();
+        for stack in schedule.arrangement {
+            top_row.push(*stack.last().unwrap());
+        }
+
+        assert_eq!("MCD", top_row);
+    }
 }
