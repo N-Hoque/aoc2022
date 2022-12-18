@@ -9,6 +9,7 @@ pub(crate) mod d06;
 pub(crate) mod d07;
 pub(crate) mod d08;
 pub(crate) mod d09;
+pub(crate) mod d10;
 
 #[must_use]
 pub fn collect_all_solutions() -> Vec<String> {
