@@ -1,4 +1,4 @@
-use aoc2022::{d8::D8Solver as DaySolver, Part, Solver};
+use aoc2022::{d9::D9Solver as DaySolver, Part, Solver};
 
 fn main() {
     let d1_p1 = DaySolver::solve(Part::One);
