@@ -151,7 +151,7 @@ mod tests {
     fn solve_sample_one() {
         let games = parse_games_by_attack(true);
 
-        let val = games.into_iter().map(Game::score).sum();
+        let val = games.into_iter().map(Game::score).sum::<u64>();
 
         assert_eq!(15u64, val);
     }
@@ -160,7 +160,7 @@ mod tests {
     fn solve_sample_two() {
         let games = parse_games_by_end_state(true);
 
-        let val = games.into_iter().map(Game::score).sum();
+        let val = games.into_iter().map(Game::score).sum::<u64>();
 
         assert_eq!(12u64, val);
     }

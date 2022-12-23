@@ -10,6 +10,7 @@ pub(crate) mod d07;
 pub(crate) mod d08;
 pub(crate) mod d09;
 pub(crate) mod d10;
+pub(crate) mod d11;
 
 #[must_use]
 pub fn collect_all_solutions() -> Vec<String> {
@@ -64,6 +65,11 @@ pub fn collect_all_solutions() -> Vec<String> {
     let s2 = d10::Solver::solve(Part::Two);
 
     solutions.push(format!("10: {s1}, \n{s2}"));
+
+    let s1 = d11::D11Solver::solve(Part::One);
+    let s2 = d11::D11Solver::solve(Part::Two);
+
+    solutions.push(format!("11: {s1}, {s2}"));
 
     solutions
 }
